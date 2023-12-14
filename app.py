@@ -8,7 +8,7 @@ headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
     # Ajout de l'instruction spéciale à chaque requête
-    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way. Use french language. [/INST]"
+    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way [/INST]"
     modified_payload = {"inputs": instruction + " " + payload["inputs"]}
     response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
@@ -19,9 +19,9 @@ def clean_response(text):
     start_index = text.find(marker)
     if start_index != -1:
         # Suppression de tout le texte avant le marqueur
-        clean_text = text[start_index + len(marker):].strip()
+        return text[start_index + len(marker):].strip()
     else:
-        clean_text = text
+        return text
 
 st.title("Simple chat")
 
@@ -38,7 +38,7 @@ for message in st.session_state.messages:
 container = st.container()
 
 # Acceptation de l'entrée de l'utilisateur
-prompt = st.chat_input("Comment puis-je t'aider ?")
+prompt = st.chat_input("What is up?")
 if prompt:
     # Ajout du message de l'utilisateur à l'historique
     st.session_state.messages.append({"role": "user", "content": prompt})
