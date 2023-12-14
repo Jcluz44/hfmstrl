@@ -3,14 +3,18 @@ import requests
 import json
 
 # Remplacez 'your_api_token_here' par votre token Hugging Face
-API_TOKEN = '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'
+import requests
 
 API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
-headers = {"Authorization": f"Bearer {API_TOKEN}"}
+headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
-    return response.json()
+	response = requests.post(API_URL, headers=headers, json=payload)
+	return response.json()
+	
+output = query({
+	"inputs": "Can you please let us know more details about your ",
+})
 
 # Interface Streamlit
 st.title('Hugging Face API Query Tool')
