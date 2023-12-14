@@ -6,10 +6,9 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-In
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-    # Ajout de l'instruction spéciale à chaque requête
-    instruction = "[INST] You are a pirate chatbot who always responds with Arr and pirate speak!
-There's a llama on my lawn, how can I get rid of him? [/INST]"
-    modified_payload = {"inputs": instruction + payload["inputs"]}
+    # Formation de l'instruction
+    instruction = "[INST] You are a general knowledge bot. You are also specialized in code and provide your answers in a synthesized way with code snippets and explanations\n"
+    modified_payload = {"inputs": instruction + payload["inputs"] + " [/INST]"}
     response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
 
