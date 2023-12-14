@@ -19,9 +19,15 @@ if user_input:
     # Envoi de la requête à l'API
     response = query({"inputs": user_input})
 
-    # Affichage de la réponse
+    # Vérification et affichage de la réponse
     if response:
-        st.write("Mistral AI répond :")
-        st.text_area("Réponse", value=response['generated_text'], height=150)
+        st.write("Réponse brute de l'API :")
+        st.write(response)  # Affiche la réponse brute pour le débogage
+
+        # S'assurer que la réponse est un dictionnaire et contient la clé 'generated_text'
+        if isinstance(response, dict) and 'generated_text' in response:
+            st.text_area("Réponse", value=response['generated_text'], height=150)
+        else:
+            st.write("La réponse n'est pas dans le format attendu.")
     else:
         st.write("Aucune réponse reçue de l'API.")
