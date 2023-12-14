@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import json
 
 # Configuration de l'API
 API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1"
@@ -9,28 +10,37 @@ def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
 
-# Création de l'interface Streamlit
-st.title('Chat avec Mistral AI')
+st.title('Chatbot Mistral AI')
 
-# Champ de saisie pour l'utilisateur
-user_input = st.text_input("Posez votre question:")
+# Initialisation de l'historique de chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if user_input:
-    # Envoi de la requête à l'API
-    response = query({"inputs": user_input})
+# Acceptation de l'entrée de l'utilisateur
+user_input = st.text_input("Posez votre question:", key="user_input")
 
-    # Vérification et affichage de la réponse
-    if response:
-        # Vérifie si la réponse est sous forme de liste ou de dictionnaire
-        if isinstance(response, list):
-            # Prendre le premier élément si la réponse est une liste
-            response_text = response[0].get('generated_text', "Pas de réponse générée.")
-        elif isinstance(response, dict):
-            # Directement accéder à 'generated_text' si la réponse est un dictionnaire
-            response_text = response.get('generated_text', "Pas de réponse générée.")
+# Gestion de la soumission de l'utilisateur
+if st.button("Envoyer"):
+    if user_input:
+        # Ajout du message de l'utilisateur à l'historique
+        st.session_state.messages.append({"role": "user", "content": user_input})
+
+        # Envoi de la requête à l'API et réception de la réponse
+        response = query({"inputs": user_input})
+        if response:
+            # Extraction de la réponse
+            response_text = response[0].get('generated_text', "Pas de réponse générée.") if isinstance(response, list) else response.get('generated_text', "Pas de réponse générée.")
+            # Ajout de la réponse de l'assistant à l'historique
+            st.session_state.messages.append({"role": "assistant", "content": response_text})
+            # Affichage du JSON brut pour le débogage
+            st.json(response)
         else:
-            response_text = "Format de réponse inattendu."
+            st.session_state.messages.append({"role": "assistant", "content": "Désolé, je ne peux pas répondre en ce moment."})
 
-        st.text_area("Réponse", value=response_text, height=150)
-    else:
-        st.write("Aucune réponse reçue de l'API.")
+        # Réinitialisation du champ de saisie
+        st.session_state.user_input = ""
+
+# Affichage des messages de l'historique
+for message in st.session_state.messages:
+    with st.container():
+        st.text_area(f"{message['role'].capitalize()} dit:", value=message["content"], height=75)
