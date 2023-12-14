@@ -3,7 +3,7 @@ import requests
 import json
 
 # Remplacez 'your_api_token_here' par votre token Hugging Face
-API_TOKEN = 'your_api_token_here'
+API_TOKEN = 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
 
 API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
