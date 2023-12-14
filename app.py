@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import time
 
 # Configuration de l'API
 API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
@@ -11,6 +12,11 @@ def query(payload):
     modified_payload = {"inputs": instruction + " " + payload["inputs"]}
     response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
+
+def clean_response(text):
+    # Suppression de l'instruction de la réponse
+    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way. Use the input language to answer. [/INST]"
+    return text.replace(instruction, "").strip()
 
 st.title("Simple chat")
 
@@ -32,10 +38,14 @@ if prompt:
     # Ajout du message de l'utilisateur à l'historique
     st.session_state.messages.append({"role": "user", "content": prompt})
 
+    # Simuler un temps de réflexion
+    time.sleep(2)  # Ajoute un délai de 2 secondes pour simuler la réflexion
+
     # Obtention de la réponse de l'assistant
     response = query({"inputs": prompt})
     if response and isinstance(response, list) and len(response) > 0 and 'generated_text' in response[0]:
-        assistant_response = response[0]['generated_text']
+        raw_response = response[0]['generated_text']
+        assistant_response = clean_response(raw_response)
     else:
         assistant_response = "Désolé, je ne peux pas répondre en ce moment."
 
