@@ -1,35 +1,27 @@
 import streamlit as st
 import requests
-import json
 
-# Remplacez 'your_api_token_here' par votre token Hugging Face
-import requests
-
+# Configuration de l'API
 API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-	response = requests.post(API_URL, headers=headers, json=payload)
-	return response.json()
-	
-output = query({
-	"inputs": "Can you please let us know more details about your ",
-})
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()
 
-# Interface Streamlit
-st.title('Hugging Face API Query Tool')
+# Création de l'interface Streamlit
+st.title('Chat avec Mistral AI')
 
-# Boîte de texte pour la requête utilisateur
-user_input = st.text_input("Entrez votre requête ici", "Can you please let us know more details about your ")
+# Champ de saisie pour l'utilisateur
+user_input = st.text_input("Posez votre question:")
 
-# Bouton pour envoyer la requête
-if st.button('Envoyer la requête'):
-    output = query({"inputs": user_input})
-    
-    # Vérifier si la réponse contient du code
-    if isinstance(output, dict) and "code" in output:
-        # Afficher le code
-        st.code(output["code"], language="python")
+if user_input:
+    # Envoi de la requête à l'API
+    response = query({"inputs": user_input})
+
+    # Affichage de la réponse
+    if response:
+        st.write("Mistral AI répond :")
+        st.text_area("Réponse", value=response['generated_text'], height=150)
     else:
-        # Afficher la réponse JSON de manière élégante
-        st.json(output)
+        st.write("Aucune réponse reçue de l'API.")
