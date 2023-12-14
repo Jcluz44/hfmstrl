@@ -7,7 +7,10 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
+    # Ajout de l'instruction spéciale à chaque requête
+    instruction = "[INST] Tu es un assistant généraliste, tu réponds familièrement aux demandes, et en français [/INST]"
+    modified_payload = {"inputs": instruction + payload["inputs"]}
+    response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
 
 st.title('Chatbot Mistral AI')
