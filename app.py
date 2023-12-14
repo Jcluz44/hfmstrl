@@ -1,4 +1,6 @@
 import streamlit as st
+import random
+import time
 import requests
 
 # Configuration de l'API
@@ -9,18 +11,18 @@ def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
 
+st.title("Simple chat")
+
 # Initialisation de l'historique de chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
-st.title("Simple chat")
 
 # Affichage des messages de l'historique
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Entrée de l'utilisateur
+# Acceptation de l'entrée de l'utilisateur
 if prompt := st.chat_input("What is up?"):
     # Ajout du message de l'utilisateur à l'historique
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -32,5 +34,15 @@ if prompt := st.chat_input("What is up?"):
     else:
         assistant_response = "Désolé, je ne peux pas répondre en ce moment."
 
+    # Simulation de la réponse de l'assistant avec un délai
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in assistant_response.split():
+            full_response += chunk + " "
+            time.sleep(0.05)
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+
     # Ajout de la réponse de l'assistant à l'historique
-    st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
