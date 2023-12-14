@@ -3,7 +3,7 @@ import requests
 import json
 
 # Configuration de l'API
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1"
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
