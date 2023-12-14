@@ -9,19 +9,23 @@ def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
 
+st.title("Simple chat")
+
 # Initialisation de l'historique de chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
-st.title("Simple chat")
 
 # Affichage des messages de l'historique
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Entrée de l'utilisateur
-if prompt := st.chat_input("What is up?"):
+# Conteneur pour la mise à jour dynamique de la réponse
+container = st.container()
+
+# Acceptation de l'entrée de l'utilisateur
+prompt = st.chat_input("What is up?")
+if prompt:
     # Ajout du message de l'utilisateur à l'historique
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -34,3 +38,9 @@ if prompt := st.chat_input("What is up?"):
 
     # Ajout de la réponse de l'assistant à l'historique
     st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+
+    # Mise à jour de l'affichage avec la nouvelle réponse
+    with container:
+        for message in st.session_state.messages[-2:]:  # Affiche le dernier message de l'utilisateur et la réponse de l'assistant
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
