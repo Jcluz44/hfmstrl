@@ -14,13 +14,14 @@ def query(payload):
     return response.json()
 
 def clean_response(text):
-    # Suppression de l'instruction et de tout texte avant la réponse réelle
-    start_index = text.find("Model answer")
+    # Recherche du début de la réponse réelle après l'instruction
+    marker = "Model answer"  # Modifier cette partie si le marqueur est différent
+    start_index = text.find(marker)
     if start_index != -1:
-        # Suppression de tout le texte avant et y compris "Model answer"
-        return text[start_index + len("Model answer"):].strip()
+        # Suppression de tout le texte avant le marqueur
+        clean_text = text[start_index + len(marker):].strip()
     else:
-        return text
+        clean_text = text
 
 st.title("Simple chat")
 
