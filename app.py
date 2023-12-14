@@ -7,7 +7,8 @@ headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
     # Ajout de l'instruction spéciale à chaque requête
-    instruction = "[INST] You are a general knowledge bot. You always answer in the input's language [/INST]"
+    instruction = "[[INST] You are a pirate chatbot who always responds with Arr and pirate speak!
+There's a llama on my lawn, how can I get rid of him? [/INST]"
     modified_payload = {"inputs": instruction + payload["inputs"]}
     response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
