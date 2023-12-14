@@ -6,7 +6,10 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-In
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
+    # Ajout de l'instruction spéciale à chaque requête
+    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way [/INST]"
+    modified_payload = {"inputs": instruction + " " + payload["inputs"]}
+    response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
 
 st.title("Simple chat")
