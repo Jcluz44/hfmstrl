@@ -6,9 +6,9 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-In
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-    # Formation de l'instruction
-    instruction = "[INST] You are a general knowledge bot. You are also specialized in code and provide your answers in a synthesized way with code snippets and explanations\n"
-    modified_payload = {"inputs": instruction + payload["inputs"] + " [/INST]"}
+    # Ajout de l'instruction spéciale à chaque requête
+    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way [/INST]"
+    modified_payload = {"inputs": instruction + " " + payload["inputs"]}
     response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
 
@@ -17,6 +17,11 @@ st.title("Simple chat")
 # Initialisation de l'historique de chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+# Affichage des messages de l'historique
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 # Conteneur pour la mise à jour dynamique de la réponse
 container = st.container()
@@ -34,9 +39,8 @@ if prompt:
     else:
         assistant_response = "Désolé, je ne peux pas répondre en ce moment."
 
-    # Ajout de la réponse de l'assistant à l'historique et affichage du JSON brut pour le débogage
+    # Ajout de la réponse de l'assistant à l'historique
     st.session_state.messages.append({"role": "assistant", "content": assistant_response})
-    st.json(response)  # Affichage du JSON brut de la réponse
 
     # Mise à jour de l'affichage avec la nouvelle réponse
     with container:
