@@ -6,8 +6,16 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-In
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
+    # Ajout de l'instruction spéciale à la requête
+    instruction = "[INST] Tu es un assistant généraliste et aide à répondre aux questions sur un ton familier. [/INST]"
+    modified_payload = {"inputs": instruction + payload["inputs"]}
+    response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
+
+def clean_response(text):
+    # Suppression de l'instruction de la réponse
+    instruction = "[INST] Tu es un assistant généraliste et aide à répondre aux questions sur un ton familier. [/INST]"
+    return text.replace(instruction, "").strip()
 
 # Création de l'interface Streamlit
 st.title('Chat avec Mistral AI')
@@ -21,12 +29,10 @@ if user_input:
 
     # Vérification et affichage de la réponse
     if response:
-        st.write("Réponse brute de l'API :")
-        st.write(response)  # Affiche la réponse brute pour le débogage
-
         # S'assurer que la réponse est un dictionnaire et contient la clé 'generated_text'
         if isinstance(response, dict) and 'generated_text' in response:
-            st.text_area("Réponse", value=response['generated_text'], height=150)
+            clean_text = clean_response(response['generated_text'])
+            st.text_area("Réponse", value=clean_text, height=150)
         else:
             st.write("La réponse n'est pas dans le format attendu.")
     else:
