@@ -6,41 +6,31 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-In
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-    # Ajout de l'instruction spéciale à la requête
-    instruction = "[INST] Tu es un assistant généraliste et aide à répondre aux questions sur un ton familier. [/INST]"
-    modified_payload = {"inputs": instruction + payload["inputs"]}
-    response = requests.post(API_URL, headers=headers, json=modified_payload)
+    response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
 
-def clean_response(text):
-    # Suppression de l'instruction de la réponse
-    instruction = "[INST] Tu es un assistant généraliste et aide à répondre aux questions sur un ton familier. [/INST]"
-    return text.replace(instruction, "").strip()
+# Initialisation de l'historique de chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Création de l'interface Streamlit
-st.title('Chat avec Mistral AI')
+st.title("Simple chat")
 
-# Champ de saisie pour l'utilisateur
-user_input = st.text_input("Posez votre question:")
+# Affichage des messages de l'historique
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-if user_input:
-    # Envoi de la requête à l'API
-    response = query({"inputs": user_input})
+# Entrée de l'utilisateur
+if prompt := st.chat_input("What is up?"):
+    # Ajout du message de l'utilisateur à l'historique
+    st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Vérification et affichage de la réponse
-    if response:
-        # Vérifie si la réponse est sous forme de liste ou de dictionnaire
-        if isinstance(response, list):
-            # Prendre le premier élément si la réponse est une liste
-            response_text = response[0].get('generated_text', "Pas de réponse générée.")
-        elif isinstance(response, dict):
-            # Directement accéder à 'generated_text' si la réponse est un dictionnaire
-            response_text = response.get('generated_text', "Pas de réponse générée.")
-        else:
-            response_text = "Format de réponse inattendu."
-
-        # Nettoyage et affichage de la réponse
-        clean_text = clean_response(response_text)
-        st.text_area("Réponse", value=clean_text, height=150)
+    # Obtention de la réponse de l'assistant
+    response = query({"inputs": prompt})
+    if response and isinstance(response, list) and len(response) > 0 and 'generated_text' in response[0]:
+        assistant_response = response[0]['generated_text']
     else:
-        st.write("Aucune réponse reçue de l'API.")
+        assistant_response = "Désolé, je ne peux pas répondre en ce moment."
+
+    # Ajout de la réponse de l'assistant à l'historique
+    st.session_state.messages.append({"role": "assistant", "content": assistant_response})
