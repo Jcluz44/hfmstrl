@@ -9,23 +9,28 @@ def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
 
-# Création de l'interface Streamlit
-st.title('Chat avec Mistral AI')
+# Initialisation de l'historique de chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Champ de saisie pour l'utilisateur
-user_input = st.text_input("Posez votre question:")
+st.title("Simple chat")
 
-if user_input:
-    # Envoi de la requête à l'API
-    response = query({"inputs": user_input})
+# Affichage des messages de l'historique
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-    # Vérification et affichage de la réponse
-    if response:
-        # Extraction du texte généré à partir de la réponse JSON
-        if isinstance(response, list) and len(response) > 0 and 'generated_text' in response[0]:
-            generated_text = response[0]['generated_text']
-            st.text_area("Réponse", value=generated_text, height=150)
-        else:
-            st.write("La réponse n'est pas dans le format attendu.")
+# Entrée de l'utilisateur
+if prompt := st.chat_input("What is up?"):
+    # Ajout du message de l'utilisateur à l'historique
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    # Obtention de la réponse de l'assistant
+    response = query({"inputs": prompt})
+    if response and isinstance(response, list) and len(response) > 0 and 'generated_text' in response[0]:
+        assistant_response = response[0]['generated_text']
     else:
-        st.write("Aucune réponse reçue de l'API.")
+        assistant_response = "Désolé, je ne peux pas répondre en ce moment."
+
+    # Ajout de la réponse de l'assistant à l'historique
+    st.session_state.messages.append({"role": "assistant", "content": assistant_response})
