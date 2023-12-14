@@ -8,15 +8,19 @@ headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
     # Ajout de l'instruction spéciale à chaque requête
-    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way. Use chat input's language to answer [/INST]"
+    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way [/INST]"
     modified_payload = {"inputs": instruction + " " + payload["inputs"]}
     response = requests.post(API_URL, headers=headers, json=modified_payload)
     return response.json()
 
 def clean_response(text):
-    # Suppression de l'instruction de la réponse
-    instruction = "[INST] You are a general purpose model. Gently answer to human questions in a synthetic way. Use chat input's language to answer  [/INST]"
-    return text.replace(instruction, "").strip()
+    # Suppression de l'instruction et de tout texte avant la réponse réelle
+    start_index = text.find("Model answer")
+    if start_index != -1:
+        # Suppression de tout le texte avant et y compris "Model answer"
+        return text[start_index + len("Model answer"):].strip()
+    else:
+        return text
 
 st.title("Simple chat")
 
