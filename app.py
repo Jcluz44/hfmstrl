@@ -21,12 +21,10 @@ if user_input:
 
     # Vérification et affichage de la réponse
     if response:
-        st.write("Réponse brute de l'API :")
-        st.write(response)  # Affiche la réponse brute pour le débogage
-
-        # S'assurer que la réponse est un dictionnaire et contient la clé 'generated_text'
-        if isinstance(response, dict) and 'generated_text' in response:
-            st.text_area("Réponse", value=response['generated_text'], height=150)
+        # Extraction du texte généré à partir de la réponse JSON
+        if isinstance(response, list) and len(response) > 0 and 'generated_text' in response[0]:
+            generated_text = response[0]['generated_text']
+            st.text_area("Réponse", value=generated_text, height=150)
         else:
             st.write("La réponse n'est pas dans le format attendu.")
     else:
