@@ -1,8 +1,19 @@
+# Import subprocess to run pip commands
+import subprocess
+import sys
+
+# Function to install required packages
+def install_packages():
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "streamlit"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "beautifulsoup4"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "requests-html"])
+
+# Run the install function
+install_packages()
+
 # Import necessary libraries
 import streamlit as st
-import requests
-import beautifulsoup4
-import requests-html
 from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 
