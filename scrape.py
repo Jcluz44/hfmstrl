@@ -1,5 +1,8 @@
 # Import necessary libraries
 import streamlit as st
+import requests
+import beautifulsoup4
+import requests-html
 from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 
